@@ -1,0 +1,1 @@
+#include "cpp_test_editor_plugin.hpp"

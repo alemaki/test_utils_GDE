@@ -86,16 +86,15 @@ void TestRunner::_ready()
     /* Ensure editor tests do not run in scene that is played */
     if (current_scene_root != nullptr) 
     {
-        /* The reason for this is to give the engine some time to pass a few frames, so the physics delta may be different than 0.
-         *  */
+        /* The reason for this is to give the engine some time to pass a few frames, so the physics delta may be different than 0. */
         /* Approximate 1 frame at 60 FPS */
         this->test_timer = ::get_scene_tree()->create_timer(1.0 / 60.0);
         this->test_timer->connect("timeout", callable_mp(this, &TestRunner::run_runtime), CONNECT_ONE_SHOT);
     }
     else 
     {
-        godot::UtilityFunctions::print("\n\nEditor tests running.\n\n");
-        this->run_editor();
+        //godot::UtilityFunctions::print("\n\nEditor tests running.\n\n");
+        //this->run_editor();
     }
 }
 
