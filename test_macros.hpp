@@ -1,7 +1,6 @@
 #ifndef BT_TEST_MACROS_HPP
 #define BT_TEST_MACROS_HPP
 
-#include <doctest.h>
 #include <godot_cpp/variant/utility_functions.hpp>
 
 #include "test_runner.hpp"
