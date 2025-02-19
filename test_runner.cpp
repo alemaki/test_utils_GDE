@@ -2,8 +2,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <doctest.h>
-
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/godot.hpp>
 
@@ -39,12 +37,13 @@ void TestRunner::run(const char* gd_filter)
     if (!(this->filter_pattern.is_empty()))
     {
         filter += "--test-case=" + this->filter_pattern;
+        godot::UtilityFunctions::print("Applying filter" + this->filter_pattern);
     }
 
     const char* argv[] = {
         "", 
         "--test-suite-exclude=*[deprecated]*", 
-        "--test-case=*[deprecated]*", 
+        "--test-case-exclude=*[deprecated]*", 
         gd_filter,
         filter.utf8().ptr(),
         this->duration_printing ? "--duration" : "",
@@ -133,6 +132,6 @@ void TestRunner::_bind_methods()
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "aborting_on_failure", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR), "set_aborting_on_failure", "is_aborting_on_failure");
 
     ClassDB::bind_method(godot::D_METHOD("set_filter_pattern", "filter_pattern"), &TestRunner::set_filter_pattern);
-    ClassDB::bind_method(godot::D_METHOD("is_filter_pattern"), &TestRunner::is_filter_pattern);
-    ADD_PROPERTY(PropertyInfo(Variant::STRING, "filter_pattern", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR), "set_filter_pattern", "is_filter_pattern");
+    ClassDB::bind_method(godot::D_METHOD("get_filter_pattern"), &TestRunner::get_filter_pattern);
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "filter_pattern", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR), "set_filter_pattern", "get_filter_pattern");
 }

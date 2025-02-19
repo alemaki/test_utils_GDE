@@ -1,6 +1,8 @@
 #ifndef TEST_RUNNER_HPP
 #define TEST_RUNNER_HPP
 
+#include <doctest.h>
+
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/classes/scene_tree_timer.hpp>
@@ -39,7 +41,7 @@ public:
         return this->duration_printing;
     }
     void set_filter_pattern(godot::String filter_pattern);
-    _FORCE_INLINE_ godot::String is_filter_pattern() const
+    _FORCE_INLINE_ godot::String get_filter_pattern() const
     {
         return this->filter_pattern;
     }
