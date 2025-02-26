@@ -22,7 +22,7 @@ godot::TypedArray<T> get_all_children_of_type(godot::Node* node)
     for (int i = 0, size = children.size(); i < size; i++)
     {
         godot::Node* child = godot::Object::cast_to<godot::Node>(children[i]);
-        if (child->get_class() == T::get_class())
+        if (child->get_class() == T::get_class_static())
         {
             result.push_back(child);
         }
