@@ -18,6 +18,7 @@ A powerful testing framework for Godot's GDExtension in C++, bringing the conven
 
 - **Exception Requirement**:  Doctest's `REQUIRE` demands GDExtension to be built with exceptions enabled. If exceptions are disabled, any `REQUIRE` will behave as `CHECK` instead.
 - **Segfault Risks**: If a test causes a segmentation fault during editor tests, it will crash the entire engine. ¯\\\_(ツ)_/¯. During runtime, only the scene/current process will crash.
+
 ## Example Usage
 
 - To initiate tests, create a `TestRunner` node within a scene (preferably outside gameplay-related scenes). When this node loads in the editor, it runs editor-related tests. If the scene containing the `TestRunner` is executed, it will run runtime tests.
