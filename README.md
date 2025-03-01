@@ -19,10 +19,18 @@ A powerful testing framework for Godot's GDExtension in C++, bringing the conven
 - **Exception Requirement**:  Doctest's `REQUIRE` demands GDExtension to be built with exceptions enabled. If exceptions are disabled, any `REQUIRE` will behave as `CHECK` instead.
 - **Segfault Risks**: If a test causes a segmentation fault during editor tests, it will crash the entire engine. ¯\\\_(ツ)_/¯. During runtime, only the scene/current process will crash.
 
+### Setup
+
+1. Ensure the following initialization functions are registered in your module:
+```cpp
+void initialize_cpp_test_module(ModuleInitializationLevel p_level);
+void uninitialize_cpp_test_module(ModuleInitializationLevel p_level);
+```
+2. Build and load the plugin into your Godot project. Once active, a new dock will appear in the Editor titled: "GDE C++ Tests"
+
 ## Example Usage
 
-- To initiate tests, create a `TestRunner` node within a scene (preferably outside gameplay-related scenes). When this node loads in the editor, it runs editor-related tests. If the scene containing the `TestRunner` is executed, it will run runtime tests.
-
+- This project now provides an **Editor Plugin** for running tests, rather than relying on a `TestRunner` node within scenes.
 
 - **Note**: The following examples are taken from another project.
 
@@ -117,13 +125,6 @@ TEST_SUITE("[editor]" "BTGraphView") /* Runs in the editor; useful for testing p
     }
 }
 ```
-
-## Installation
-
-1. Clone the framework in your GDExtension project.
-2. Ensure your build supports exceptions if using `REQUIRE`. (Optional)
-3. Run tests normally within the Godot engine with the `TestRunner` node.
-
 
 ## Future of the project
 
