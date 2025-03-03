@@ -18,7 +18,7 @@ private:
     static std::unordered_set<void*> watched_objects;
 
 private:
-    /* In Godot, signals can have a maximum of 5 parameters. 
+    /* In Godot, signals can have a maximum of 5 parameters.
     This limitation is built into the Godot engine.*/
     static void on_signal_emitted_0_params(const godot::String& signal_key);
     static void on_signal_emitted_1_params(godot::Variant param1,
@@ -41,7 +41,7 @@ private:
                                            godot::Variant param4,
                                            godot::Variant param5,
                                            const godot::String& signal_key);
-    
+
     static void connect_target_signal(godot::Object* target, const godot::Dictionary& signal_info);
 
 public:

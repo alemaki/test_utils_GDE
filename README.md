@@ -102,18 +102,18 @@ void BTGraphView::create_task_node(const godot::StringName& task_name, const god
     ...
 }
 
-/* Testing for expected errors.*/
+/* Testing for expected errors. */
 #define DOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS
 #include "tests_utils_GDE/test_macros.hpp"
 #include "somewhere/graph_view.hpp"
 
-TEST_SUITE("[editor]" "BTGraphView") /* Runs in the editor; useful for testing plugins and UI elements. */
+TEST_SUITE("[editor]" "BTGraphView") /* Runs in the editor when marked with [editor]; useful for testing plugins and UI elements. */
 {
     TEST_CASE_FIXTURE(BTGraphViewFixture, "Fail to create task node")
     {
         SUBCASE("Non-existent nodes")
         {
-            CHECK_GODOT_ERROR(graph_view->create_task_node("", "TaskClass")); /* Won't produce an error print.*/
+            CHECK_GODOT_ERROR(graph_view->create_task_node("", "TaskClass")); /* Won't produce an error print. Will except any ERR_FAIL* call inside the function. */
             CHECK_GODOT_ERROR(graph_view->create_task_node("task_1", ""));
         }
 

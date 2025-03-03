@@ -33,7 +33,7 @@ TestRunner::g_error_called = false;                                             
 TestRunner::currently_testing_error = true;                                                                                                                                 \
 expression;                                                                                                                                                                 \
 CHECK(TestRunner::g_error_called);                                                                                                                                          \
-TestRunner::currently_testing_error = false;                                                                                                                        
+TestRunner::currently_testing_error = false;
 
 
 #define REQUIRE_GODOT_ERROR(expression) /**********************************************************************************************************************************/\

@@ -33,19 +33,22 @@ void custom_gdextension_interface_print_error_with_message(const char *p_descrip
 
 void TestRunner::run(const char* gd_filter)
 {
-    godot::String filter;
+    godot::String tests_filter;
+    godot::String suite_filter;
     if (!(this->filter_pattern.is_empty()))
     {
-        filter += "--test-case=" + this->filter_pattern;
+        tests_filter += "--test-case=" + this->filter_pattern;
+        suite_filter += "--test-suite=" + this->filter_pattern;
         godot::UtilityFunctions::print("Applying filter" + this->filter_pattern);
     }
 
     const char* argv[] = {
-        "", 
-        "--test-suite-exclude=*[deprecated]*", 
-        "--test-case-exclude=*[deprecated]*", 
+        "",
+        "--test-suite-exclude=*[deprecated]*",
+        "--test-case-exclude=*[deprecated]*",
         gd_filter,
-        filter.utf8().ptr(),
+        tests_filter.utf8().ptr(),
+        suite_filter.utf8().ptr(),
         this->duration_printing ? "--duration" : "",
         this->aborting_on_failure ? "--abort-after=1" : "",
     };
@@ -92,7 +95,7 @@ void TestRunner::_ready()
 {
     godot::Node* current_scene_root = ::get_scene_root();
     /* Ensure editor tests do not run in scene that is played */
-    if (current_scene_root != nullptr) 
+    if (current_scene_root != nullptr)
     {
         /* The reason for this is to give the engine some time to pass a few frames, so the physics delta may be different than 0. */
         /* Approximate 1 frame at 60 FPS */
@@ -122,7 +125,7 @@ void TestRunner::_bind_methods()
 
     ClassDB::bind_method(godot::D_METHOD("run_runtime"), &TestRunner::run_runtime);
     ClassDB::bind_method(godot::D_METHOD("run_editor"), &TestRunner::run_editor);
-    
+
     ClassDB::bind_method(godot::D_METHOD("set_duration_printing", "duration_printing"), &TestRunner::set_duration_printing);
     ClassDB::bind_method(godot::D_METHOD("is_duration_printing"), &TestRunner::is_duration_printing);
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "duration_printing", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR), "set_duration_printing", "is_duration_printing");

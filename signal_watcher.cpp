@@ -38,7 +38,7 @@ void SignalWatcher::on_signal_emitted_3_params(godot::Variant param1, godot::Var
 {
     std::string signal_key_std = signal_key.utf8().ptr();
     signal_count[signal_key_std]++;
-    
+
     godot::Array arr;
     arr.resize(3);
     arr[0] = param1;
@@ -51,7 +51,7 @@ void SignalWatcher::on_signal_emitted_4_params(godot::Variant param1, godot::Var
 {
     std::string signal_key_std = signal_key.utf8().ptr();
     signal_count[signal_key_std]++;
-    
+
     godot::Array arr;
     arr.resize(4);
     arr[0] = param1;
@@ -65,7 +65,7 @@ void SignalWatcher::on_signal_emitted_5_params(godot::Variant param1, godot::Var
 {
     std::string signal_key_std = signal_key.utf8().ptr();
     signal_count[signal_key_std]++;
-    
+
     godot::Array arr;
     arr.resize(5);
     arr[0] = param1;
@@ -114,7 +114,7 @@ void SignalWatcher::connect_target_signal(godot::Object* target, const godot::Di
         result = target->connect(signal_name, callable_mp_static(&SignalWatcher::on_signal_emitted_5_params).bind(signal_key));
     }
 
-    if (result != godot::OK) 
+    if (result != godot::OK)
     {
         godot::UtilityFunctions::print("Failed to connect signal: ", signal_name, " on object: ", target);
     }
@@ -129,7 +129,7 @@ void SignalWatcher::watch_signals(godot::Object* target)
     SignalWatcher::reset_object(target);
 
     godot::Array signal_list = target->get_signal_list();
-    for (int i = 0; i < signal_list.size(); i++) 
+    for (int i = 0; i < signal_list.size(); i++)
     {
         godot::Dictionary signal_info = signal_list[i];
         SignalWatcher::connect_target_signal(target, signal_info);
@@ -177,7 +177,7 @@ void SignalWatcher::reset_object(godot::Object* target)
     }
 
     godot::Array signal_list = target->get_signal_list();
-    for (int i = 0; i < signal_list.size(); i++) 
+    for (int i = 0; i < signal_list.size(); i++)
     {
         godot::Dictionary signal_info = signal_list[i];
         godot::String signal_name = signal_info["name"];
