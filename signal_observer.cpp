@@ -1,17 +1,17 @@
 #include "signal_watcher.hpp"
 
-std::unordered_map<std::string, int> SignalWatcher::signal_count;
-std::unordered_map<std::string, godot::Array> SignalWatcher::signal_last_arguments;
-std::unordered_set<void*> SignalWatcher::watched_objects;
+std::unordered_map<std::string, int> SignalObserver::signal_count;
+std::unordered_map<std::string, godot::Array> SignalObserver::signal_last_arguments;
+std::unordered_set<void*> SignalObserver::watched_objects;
 
-void SignalWatcher::on_signal_emitted_0_params(const godot::String& signal_key)
+void SignalObserver::on_signal_emitted_0_params(const godot::String& signal_key)
 {
     std::string signal_key_std = signal_key.utf8().ptr();
     signal_count[signal_key_std]++;
     signal_last_arguments[signal_key_std] = godot::Array();
 }
 
-void SignalWatcher::on_signal_emitted_1_params(godot::Variant param1, const godot::String& signal_key)
+void SignalObserver::on_signal_emitted_1_params(godot::Variant param1, const godot::String& signal_key)
 {
     std::string signal_key_std = signal_key.utf8().ptr();
     signal_count[signal_key_std]++;
@@ -22,7 +22,7 @@ void SignalWatcher::on_signal_emitted_1_params(godot::Variant param1, const godo
     signal_last_arguments[signal_key_std] = arr;
 }
 
-void SignalWatcher::on_signal_emitted_2_params(godot::Variant param1, godot::Variant param2, const godot::String& signal_key)
+void SignalObserver::on_signal_emitted_2_params(godot::Variant param1, godot::Variant param2, const godot::String& signal_key)
 {
     std::string signal_key_std = signal_key.utf8().ptr();
     signal_count[signal_key_std]++;
@@ -34,7 +34,7 @@ void SignalWatcher::on_signal_emitted_2_params(godot::Variant param1, godot::Var
     signal_last_arguments[signal_key_std] = arr;
 }
 
-void SignalWatcher::on_signal_emitted_3_params(godot::Variant param1, godot::Variant param2, godot::Variant param3, const godot::String& signal_key)
+void SignalObserver::on_signal_emitted_3_params(godot::Variant param1, godot::Variant param2, godot::Variant param3, const godot::String& signal_key)
 {
     std::string signal_key_std = signal_key.utf8().ptr();
     signal_count[signal_key_std]++;
@@ -47,7 +47,7 @@ void SignalWatcher::on_signal_emitted_3_params(godot::Variant param1, godot::Var
     signal_last_arguments[signal_key_std] = arr;
 }
 
-void SignalWatcher::on_signal_emitted_4_params(godot::Variant param1, godot::Variant param2, godot::Variant param3, godot::Variant param4, const godot::String& signal_key)
+void SignalObserver::on_signal_emitted_4_params(godot::Variant param1, godot::Variant param2, godot::Variant param3, godot::Variant param4, const godot::String& signal_key)
 {
     std::string signal_key_std = signal_key.utf8().ptr();
     signal_count[signal_key_std]++;
@@ -61,7 +61,7 @@ void SignalWatcher::on_signal_emitted_4_params(godot::Variant param1, godot::Var
     signal_last_arguments[signal_key_std] = arr;
 }
 
-void SignalWatcher::on_signal_emitted_5_params(godot::Variant param1, godot::Variant param2, godot::Variant param3, godot::Variant param4, godot::Variant param5, const godot::String& signal_key)
+void SignalObserver::on_signal_emitted_5_params(godot::Variant param1, godot::Variant param2, godot::Variant param3, godot::Variant param4, godot::Variant param5, const godot::String& signal_key)
 {
     std::string signal_key_std = signal_key.utf8().ptr();
     signal_count[signal_key_std]++;
@@ -76,7 +76,7 @@ void SignalWatcher::on_signal_emitted_5_params(godot::Variant param1, godot::Var
     signal_last_arguments[signal_key_std] = arr;
 }
 
-void SignalWatcher::connect_target_signal(godot::Object* target, const godot::Dictionary& signal_info)
+void SignalObserver::connect_target_signal(godot::Object* target, const godot::Dictionary& signal_info)
 {
     godot::String signal_name = signal_info["name"];
     godot::String signal_key = godot::itos(target->get_instance_id()) + signal_name;
@@ -91,27 +91,27 @@ void SignalWatcher::connect_target_signal(godot::Object* target, const godot::Di
     godot::Error result = godot::Error::OK;
     if (arg_size == 0)
     {
-        result = target->connect(signal_name, callable_mp_static(&SignalWatcher::on_signal_emitted_0_params).bind(signal_key));
+        result = target->connect(signal_name, callable_mp_static(&SignalObserver::on_signal_emitted_0_params).bind(signal_key));
     }
     if (arg_size == 1)
     {
-        result = target->connect(signal_name, callable_mp_static(&SignalWatcher::on_signal_emitted_1_params).bind(signal_key));
+        result = target->connect(signal_name, callable_mp_static(&SignalObserver::on_signal_emitted_1_params).bind(signal_key));
     }
     if (arg_size == 2)
     {
-        result = target->connect(signal_name, callable_mp_static(&SignalWatcher::on_signal_emitted_2_params).bind(signal_key));
+        result = target->connect(signal_name, callable_mp_static(&SignalObserver::on_signal_emitted_2_params).bind(signal_key));
     }
     if (arg_size == 3)
     {
-        result = target->connect(signal_name, callable_mp_static(&SignalWatcher::on_signal_emitted_3_params).bind(signal_key));
+        result = target->connect(signal_name, callable_mp_static(&SignalObserver::on_signal_emitted_3_params).bind(signal_key));
     }
     if (arg_size == 4)
     {
-        result = target->connect(signal_name, callable_mp_static(&SignalWatcher::on_signal_emitted_4_params).bind(signal_key));
+        result = target->connect(signal_name, callable_mp_static(&SignalObserver::on_signal_emitted_4_params).bind(signal_key));
     }
     if (arg_size == 5)
     {
-        result = target->connect(signal_name, callable_mp_static(&SignalWatcher::on_signal_emitted_5_params).bind(signal_key));
+        result = target->connect(signal_name, callable_mp_static(&SignalObserver::on_signal_emitted_5_params).bind(signal_key));
     }
 
     if (result != godot::OK)
@@ -124,35 +124,35 @@ void SignalWatcher::connect_target_signal(godot::Object* target, const godot::Di
     }
 }
 
-void SignalWatcher::watch_signals(godot::Object* target)
+void SignalObserver::watch_signals(godot::Object* target)
 {
-    SignalWatcher::reset_object(target);
+    SignalObserver::reset_object(target);
 
     godot::Array signal_list = target->get_signal_list();
     for (int i = 0; i < signal_list.size(); i++)
     {
         godot::Dictionary signal_info = signal_list[i];
-        SignalWatcher::connect_target_signal(target, signal_info);
+        SignalObserver::connect_target_signal(target, signal_info);
     }
 }
 
-bool SignalWatcher::signal_emitted(godot::Object* target, const godot::String& signal_name)
+bool SignalObserver::signal_emitted(godot::Object* target, const godot::String& signal_name)
 {
     std::string signal_key = (godot::itos(target->get_instance_id()) + signal_name).utf8().ptr();
     auto it = signal_count.find(signal_key);
     return (it != signal_count.end()) && (it->second != 0);
 }
 
-int SignalWatcher::get_signal_emitted_count(godot::Object* target, const godot::String& signal_name)
+int SignalObserver::get_signal_emitted_count(godot::Object* target, const godot::String& signal_name)
 {
     std::string signal_key = (godot::itos(target->get_instance_id()) + signal_name).utf8().ptr();
     auto it = signal_count.find(signal_key);
     return it != signal_count.end() ? it->second : 0;
 }
 
-godot::Array SignalWatcher::get_signal_emitted_arguments(godot::Object* target, const godot::String& signal_name)
+godot::Array SignalObserver::get_signal_emitted_arguments(godot::Object* target, const godot::String& signal_name)
 {
-    if (!(SignalWatcher::signal_emitted(target, signal_name)))
+    if (!(SignalObserver::signal_emitted(target, signal_name)))
     {
         return godot::Array();
     }
@@ -161,7 +161,7 @@ godot::Array SignalWatcher::get_signal_emitted_arguments(godot::Object* target, 
     return signal_last_arguments[signal_key];
 }
 
-void SignalWatcher::reset()
+void SignalObserver::reset()
 {
     for (auto& [key, value] : signal_count)
     {
@@ -169,7 +169,7 @@ void SignalWatcher::reset()
     }
 }
 
-void SignalWatcher::reset_object(godot::Object* target)
+void SignalObserver::reset_object(godot::Object* target)
 {
     if (watched_objects.find(target) == watched_objects.end())
     {
