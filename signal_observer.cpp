@@ -1,4 +1,4 @@
-#include "signal_watcher.hpp"
+#include "signal_observer.hpp"
 
 std::unordered_map<std::string, int> SignalObserver::signal_count;
 std::unordered_map<std::string, godot::Array> SignalObserver::signal_last_arguments;

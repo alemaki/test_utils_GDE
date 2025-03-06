@@ -4,7 +4,7 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 
 #include "test_runner.hpp"
-#include "signal_watcher.hpp"
+#include "signal_observer.hpp"
 #include "test_utils.hpp"
 
 #ifdef CHECK_VECTORS_EQ
