@@ -78,6 +78,7 @@ TEST_SUITE("HealthComponentTests") /* Runs at runtime since it is not specified 
 }
 ```
 
+### Errors
 - These tests will detect `ERR_FAIL_**` calls without producing error prints within `CHECK_GODOT_ERROR` or `REQUIRE_GODOT_ERROR` bounds.
 - **NOTE**: They currently do not support `EDMSG` prints—this is planned for future updates.
 
