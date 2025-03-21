@@ -72,11 +72,13 @@ void TestRunner::run(const char* filter)
 
 void TestRunner::run_runtime()
 {
+    godot::UtilityFunctions::print("\n\nRuntime tests running.\n\n");
     this->run("--test-suite-exclude=*[editor]*");
 }
 
 void TestRunner::run_editor()
 {
+    godot::UtilityFunctions::print("\n\nEditor tests running.\n\n");
     this->run("--test-suite=*[editor]*");
 }
 
@@ -94,7 +96,6 @@ void TestRunner::_ready()
     }
     else 
     {
-        godot::UtilityFunctions::print("\n\nEditor tests running.\n\n");
         this->run_editor();
     }
 }
