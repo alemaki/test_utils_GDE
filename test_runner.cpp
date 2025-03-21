@@ -7,6 +7,8 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/godot.hpp>
 
+#include "test_utils.hpp"
+
 GDExtensionInterfacePrintError original_gdextension_interface_print_error = nullptr;
 GDExtensionInterfacePrintErrorWithMessage original_gdextension_interface_print_error_with_message = nullptr;
 
