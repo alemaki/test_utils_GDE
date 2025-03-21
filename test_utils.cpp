@@ -2,6 +2,16 @@
 
 #include <godot_cpp/classes/engine.hpp>
 
+godot::SceneTree* get_scene_tree()
+{
+    return godot::Object::cast_to<godot::SceneTree>(godot::Engine::get_singleton()->get_main_loop());
+}
+
+godot::Node* get_scene_root()
+{
+    return get_scene_tree()->get_current_scene();
+}
+
 void simulate_frame_physics_process(godot::Node* node, float delta)
 {
 	godot::Array children = node->get_children();
@@ -44,10 +54,10 @@ void simulate(godot::Node* node, int frames)
 
 double get_current_engine_delta()
 {
-	return  godot::Engine::get_singleton()->is_in_physics_frame() ? ::get_scene_root()->get_physics_process_delta_time() : ::get_scene_root()->get_process_delta_time();
+	return godot::Engine::get_singleton()->is_in_physics_frame() ? ::get_scene_root()->get_physics_process_delta_time() : ::get_scene_root()->get_process_delta_time();
 }
 
 double get_node_delta(godot::Node* node)
 {
-	return  godot::Engine::get_singleton()->is_in_physics_frame() ? node->get_physics_process_delta_time() : node->get_process_delta_time();
+	return godot::Engine::get_singleton()->is_in_physics_frame() ? node->get_physics_process_delta_time() : node->get_process_delta_time();
 }
