@@ -7,6 +7,50 @@
 
 #include "test_utils.hpp"
 
+static thread_local const char* g_current_test_name = nullptr;
+
+// Custom reporter to track test start/end
+struct GodotReporter : public doctest::IReporter {
+    using IReporter::IReporter;
+
+    //DOCTEST_DECLARE_INTERFACE(GodotReporter);
+    GodotReporter(const doctest::ContextOptions& in) : IReporter() {}
+
+    void test_run_start() override {}
+
+    void test_run_end(const doctest::TestRunStats&) override {}
+
+    void test_case_start(const doctest::TestCaseData& in) override {
+        g_current_test_name = in.m_name;
+    }
+
+    // Called when a test case is reentered (e.g., due to subcases)
+    void test_case_reenter(const doctest::TestCaseData&) override {}
+
+    void test_case_end(const doctest::CurrentTestCaseStats&) override {
+        g_current_test_name = nullptr;
+    }
+
+    // Called if a test case throws
+    void test_case_exception(const doctest::TestCaseException&) override {}
+
+    void subcase_start(const doctest::SubcaseSignature&) override {}
+    void subcase_end() override {}
+
+    // Called for asserts and messages
+    void log_assert(const doctest::AssertData&) override {}
+    void log_message(const doctest::MessageData&) override {}
+
+    // Called for skipped tests
+    void test_case_skipped(const doctest::TestCaseData&) override {}
+
+    // Query reporting (for listing tests, etc.)
+    void report_query(const doctest::QueryData&) override {}
+};
+
+
+REGISTER_REPORTER("godot", 1, GodotReporter);
+
 GDExtensionInterfacePrintError original_gdextension_interface_print_error = nullptr;
 GDExtensionInterfacePrintErrorWithMessage original_gdextension_interface_print_error_with_message = nullptr;
 
@@ -19,6 +63,7 @@ void custom_gdextension_interface_print_error(const char *p_description, const c
     if (!(TestRunner::currently_testing_error))
     {
         original_gdextension_interface_print_error(p_description, p_function, p_file, p_line, p_editor_notify);
+        godot::UtilityFunctions::print("Error in test: ", g_current_test_name);
     }
 }
 
@@ -28,6 +73,7 @@ void custom_gdextension_interface_print_error_with_message(const char *p_descrip
     if (!(TestRunner::currently_testing_error))
     {
         original_gdextension_interface_print_error_with_message(p_description, p_message, p_function, p_file, p_line, p_editor_notify);
+        godot::UtilityFunctions::print("Error in test: ", g_current_test_name);
     }
 }
 
@@ -54,9 +100,9 @@ void TestRunner::run(const char* gd_filter)
     };
     int argc = sizeof(argv) / sizeof(argv[0]);
     doctest::Context context(argc, argv);
-
     std::stringstream output_stream;
 
+    context.setOption("reporters", "godot");
     context.setCout(&output_stream);
 
     /* save for later */
