@@ -1,6 +1,10 @@
 #include "test_runner.hpp"
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <algorithm>
 
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/godot.hpp>
@@ -18,20 +22,25 @@ struct GodotReporter : public doctest::IReporter {
 
     void test_run_start() override {}
 
-    void test_run_end(const doctest::TestRunStats&) override {}
+    void test_run_end(const doctest::TestRunStats& in) override {
+        godot::UtilityFunctions::print(godot::vformat(
+            "Tests finished: %d/%d test cases passed, %d/%d asserts passed",
+            in.numTestCasesPassingFilters - in.numTestCasesFailed, in.numTestCasesPassingFilters,
+            in.numAsserts - in.numAssertsFailed, in.numAsserts
+        ));
+    }
 
     void test_case_start(const doctest::TestCaseData& in) override {
         g_current_test_name = in.m_name;
     }
 
-    // Called when a test case is reentered (e.g., due to subcases)
+    // (due to subcases)
     void test_case_reenter(const doctest::TestCaseData&) override {}
 
     void test_case_end(const doctest::CurrentTestCaseStats&) override {
         g_current_test_name = nullptr;
     }
 
-    // Called if a test case throws
     void test_case_exception(const doctest::TestCaseException&) override {}
 
     void subcase_start(const doctest::SubcaseSignature&) override {}
@@ -41,7 +50,6 @@ struct GodotReporter : public doctest::IReporter {
     void log_assert(const doctest::AssertData&) override {}
     void log_message(const doctest::MessageData&) override {}
 
-    // Called for skipped tests
     void test_case_skipped(const doctest::TestCaseData&) override {}
 
     // Query reporting (for listing tests, etc.)
@@ -49,13 +57,81 @@ struct GodotReporter : public doctest::IReporter {
 };
 
 
+// Sideline listener: Listener always run in background, no affected
+// by the --reporters flag. Reports per-suite timing every run, and
+// per-test-case timing when TestRunner::g_print_timing is enabled
+struct TimingListener : public doctest::IReporter {
+    using IReporter::IReporter;
+
+    TimingListener(const doctest::ContextOptions& in) : IReporter() {}
+
+    std::unordered_map<std::string, double> suite_totals;
+    const char* current_name = nullptr;
+    const char* current_suite = nullptr;
+
+    void test_run_start() override {
+        this->suite_totals.clear();
+    }
+
+    void test_run_end(const doctest::TestRunStats&) override {
+        std::vector<std::pair<std::string, double>> totals(this->suite_totals.begin(), this->suite_totals.end());
+        std::sort(totals.begin(), totals.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
+
+        godot::UtilityFunctions::print("---- Suite timings ----");
+        for (const auto& entry : totals)
+        {
+            godot::UtilityFunctions::print(godot::vformat(
+                "[%ss] %s",
+                godot::String::num(entry.second, 3),
+                entry.first.empty() ? "(no suite)" : entry.first.c_str()
+            ));
+        }
+    }
+
+    void test_case_start(const doctest::TestCaseData& in) override {
+        this->current_name = in.m_name;
+        this->current_suite = in.m_test_suite;
+    }
+
+    void test_case_reenter(const doctest::TestCaseData&) override {}
+
+    void test_case_end(const doctest::CurrentTestCaseStats& in) override {
+        this->suite_totals[this->current_suite ? this->current_suite : "?"] += in.seconds;
+
+        if (TestRunner::g_print_timing)
+        {
+            godot::UtilityFunctions::print(godot::vformat(
+                "[%ss] %s - %s",
+                godot::String::num(in.seconds, 3),
+                this->current_name ? this->current_name : "?",
+                in.testCaseSuccess ? "PASS" : "FAIL"
+            ));
+        }
+    }
+
+    void test_case_exception(const doctest::TestCaseException&) override {}
+
+    void subcase_start(const doctest::SubcaseSignature&) override {}
+    void subcase_end() override {}
+
+    void log_assert(const doctest::AssertData&) override {}
+    void log_message(const doctest::MessageData&) override {}
+
+    void test_case_skipped(const doctest::TestCaseData&) override {}
+
+    void report_query(const doctest::QueryData&) override {}
+};
+
+
 REGISTER_REPORTER("godot", 1, GodotReporter);
+REGISTER_LISTENER("timing", 1, TimingListener);
 
 GDExtensionInterfacePrintError original_gdextension_interface_print_error = nullptr;
 GDExtensionInterfacePrintErrorWithMessage original_gdextension_interface_print_error_with_message = nullptr;
 
 bool TestRunner::g_error_called = false;
 bool TestRunner::currently_testing_error = false;
+bool TestRunner::g_print_timing = false;
 
 void custom_gdextension_interface_print_error(const char *p_description, const char *p_function, const char *p_file, int32_t p_line, GDExtensionBool p_editor_notify)
 {
@@ -95,14 +171,15 @@ void TestRunner::run(const char* gd_filter)
         gd_filter,
         tests_filter.utf8().ptr(),
         suite_filter.utf8().ptr(),
-        this->duration_printing ? "--duration" : "",
+        //this->duration_printing ? "--duration" : "",
         this->aborting_on_failure ? "--abort-after=1" : "",
     };
     int argc = sizeof(argv) / sizeof(argv[0]);
     doctest::Context context(argc, argv);
     std::stringstream output_stream;
 
-    context.setOption("reporters", "godot");
+    /* TODO: make an optinon for custom reporter */
+    //context.setOption("reporters", "godot");
     context.setCout(&output_stream);
 
     /* save for later */
@@ -153,6 +230,7 @@ void TestRunner::_ready()
 void TestRunner::set_duration_printing(bool duration_printing)
 {
     this->duration_printing = duration_printing;
+    TestRunner::g_print_timing = duration_printing;
 }
 
 void TestRunner::set_aborting_on_failure(bool aborting_on_failure)

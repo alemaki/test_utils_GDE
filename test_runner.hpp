@@ -14,6 +14,7 @@ class TestRunner : public godot::Node
 public:
     static bool g_error_called;
     static bool currently_testing_error;
+    static bool g_print_timing;
 
 private:
     bool tests_ran = false;
@@ -38,7 +39,7 @@ public:
     void set_aborting_on_failure(bool aborting_on_failure);
     _FORCE_INLINE_ bool is_aborting_on_failure() const
     {
-        return this->duration_printing;
+        return this->aborting_on_failure;
     }
     void set_filter_pattern(godot::String filter_pattern);
     _FORCE_INLINE_ godot::String get_filter_pattern() const
