@@ -6,6 +6,7 @@
 
 godot::SceneTree* get_scene_tree();
 godot::Node* get_scene_root();
+void clear_scene_root();
 
 void simulate(godot::Node* node, int frames = 1);
 

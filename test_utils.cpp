@@ -1,5 +1,6 @@
 #include "test_utils.hpp"
 
+#include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/engine.hpp>
 
 godot::SceneTree* get_scene_tree()
@@ -10,6 +11,18 @@ godot::SceneTree* get_scene_tree()
 godot::Node* get_scene_root()
 {
     return get_scene_tree()->get_current_scene();
+}
+
+void clear_scene_root()
+{
+	godot::Node* root = get_scene_root();
+	godot::TypedArray<godot::Node> children = root->get_children();
+	for (int i = children.size() - 1; i >= 0; i--) /* backwards is faster because of indexing? */
+	{
+		godot::Node* child = godot::Object::cast_to<godot::Node>(children[i]);
+		root->remove_child(godot::Object::cast_to<godot::Node>(children[i]));
+		child->queue_free();
+	}
 }
 
 void simulate_frame_physics_process(godot::Node* node, float delta)
