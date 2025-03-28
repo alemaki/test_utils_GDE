@@ -16,13 +16,16 @@ void CppTestEditorPlugin::_enter_tree()
     editor_btn->connect("pressed", callable_mp(this, &CppTestEditorPlugin::run_editor_tests));
     this->dock->add_child(editor_btn);
 
-    this->duration_printing_checkbox = memnew(godot::CheckBox);
+    this->test_duration_printing_checkbox = memnew(godot::CheckBox);
+    this->suite_duration_printing_checkbox = memnew(godot::CheckBox);
     this->aborting_on_failure_checkbox = memnew(godot::CheckBox);
 
-    this->duration_printing_checkbox->set_text("Print test durations.");
+    this->test_duration_printing_checkbox->set_text("Print test durations.");
+    this->suite_duration_printing_checkbox->set_text("Print suite durations.");
     this->aborting_on_failure_checkbox->set_text("Abort on first failure.");
 
-    this->dock->add_child(this->duration_printing_checkbox);
+    this->dock->add_child(this->test_duration_printing_checkbox);
+    this->dock->add_child(this->suite_duration_printing_checkbox);
     this->dock->add_child(this->aborting_on_failure_checkbox);
 
     this->tests_filter_line_edit = memnew(godot::LineEdit);
@@ -40,9 +43,13 @@ void CppTestEditorPlugin::_exit_tree()
 TestRunner *CppTestEditorPlugin::create_runner()
 {
     TestRunner *runner = memnew(TestRunner);
-    if (this->duration_printing_checkbox)
+    if (this->test_duration_printing_checkbox)
     {
-        runner->set_duration_printing(this->duration_printing_checkbox->is_pressed());
+        runner->set_test_duration_printing(this->test_duration_printing_checkbox->is_pressed());
+    }
+    if (this->suite_duration_printing_checkbox)
+    {
+        runner->set_suite_duration_printing(this->suite_duration_printing_checkbox->is_pressed());
     }
     if (this->aborting_on_failure_checkbox)
     {

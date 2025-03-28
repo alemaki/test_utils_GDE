@@ -30,17 +30,17 @@
 
 #define CHECK_GODOT_ERROR(expression) /************************************************************************************************************************************/\
 TestRunner::g_error_called = false;                                                                                                                                         \
-TestRunner::currently_testing_error = true;                                                                                                                                 \
+TestRunner::g_currently_testing_error = true;                                                                                                                                 \
 expression;                                                                                                                                                                 \
 CHECK(TestRunner::g_error_called);                                                                                                                                          \
-TestRunner::currently_testing_error = false;
+TestRunner::g_currently_testing_error = false;
 
 
 #define REQUIRE_GODOT_ERROR(expression) /**********************************************************************************************************************************/\
 TestRunner::g_error_called = false;                                                                                                                                         \
-TestRunner::currently_testing_error = true;                                                                                                                                 \
+TestRunner::g_currently_testing_error = true;                                                                                                                                 \
 expression;                                                                                                                                                                 \
 REQUIRE(TestRunner::g_error_called);                                                                                                                                        \
-TestRunner::currently_testing_error = false;
+TestRunner::g_currently_testing_error = false;
 
 #endif /* BT_TEST_MACROS_HPP */

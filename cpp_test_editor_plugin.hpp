@@ -22,7 +22,8 @@ class CppTestEditorPlugin : public godot::EditorPlugin
 
 private:
     godot::Control* dock = nullptr;
-    godot::CheckBox* duration_printing_checkbox = nullptr;
+    godot::CheckBox* test_duration_printing_checkbox = nullptr;
+    godot::CheckBox* suite_duration_printing_checkbox = nullptr;
     godot::CheckBox* aborting_on_failure_checkbox = nullptr;
     godot::LineEdit* tests_filter_line_edit = nullptr;
 public:

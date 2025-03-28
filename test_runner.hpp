@@ -13,14 +13,17 @@ class TestRunner : public godot::Node
 
 public:
     static bool g_error_called;
-    static bool currently_testing_error;
-    static bool g_print_timing;
+    static bool g_currently_testing_error;
+    static bool g_print_test_timing;
+    static bool g_print_suite_timing;
 
 private:
     bool tests_ran = false;
     godot::Ref<godot::SceneTreeTimer> test_timer;
 
-    bool duration_printing = false;
+    /* TODO: this is currently ugly ah with those globals. THink of something better. */
+    bool test_duration_printing = false;
+    bool suite_duration_printing = false;
     bool aborting_on_failure = false;
     godot::String filter_pattern = "";
 protected:
@@ -31,10 +34,15 @@ public:
     void run_editor();
     virtual void _ready() override;
 
-    void set_duration_printing(bool duration_printing);
-    _FORCE_INLINE_ bool is_duration_printing() const
+    void set_test_duration_printing(bool test_duration_printing);
+    _FORCE_INLINE_ bool is_test_duration_printing() const
     {
-        return this->duration_printing;
+        return this->test_duration_printing;
+    }
+    void set_suite_duration_printing(bool test_duration_printing);
+    _FORCE_INLINE_ bool is_suite_duration_printing() const
+    {
+        return this->suite_duration_printing;
     }
     void set_aborting_on_failure(bool aborting_on_failure);
     _FORCE_INLINE_ bool is_aborting_on_failure() const
