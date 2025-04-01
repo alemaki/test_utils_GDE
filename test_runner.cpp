@@ -6,196 +6,16 @@
 #include <vector>
 #include <algorithm>
 
+#include <doctest.h>
+
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/godot.hpp>
 
 #include "test_utils.hpp"
+#include "godot_error_interceptor.hpp"
 
-static const char* godot_reporter_name = "GDE C++ Tests";
-static thread_local const char* g_current_test_name = nullptr;
-
-/* Custom reporter to track test start/end */
-struct GodotReporter : public doctest::IReporter
-{
-    using IReporter::IReporter;
-
-    //DOCTEST_DECLARE_INTERFACE(GodotReporter);
-    GodotReporter(const doctest::ContextOptions& in) : IReporter() {}
-
-    void test_run_start() override {}
-
-    void test_run_end(const doctest::TestRunStats& in) override
-    {
-        godot::UtilityFunctions::print("---- Test Results ----");
-        godot::UtilityFunctions::print(
-            godot::vformat("[%s] test cases: %d | %d passed | %d failed | %d skipped", 
-                godot_reporter_name, 
-                in.numTestCases, 
-                in.numTestCasesPassingFilters - in.numTestCasesFailed, 
-                in.numTestCasesFailed, 
-                in.numTestCases - in.numTestCasesPassingFilters
-            )
-        );
-        
-        godot::UtilityFunctions::print(
-            godot::vformat("[%s] assertions: %d | %d passed | %d failed | ", 
-                godot_reporter_name, 
-                in.numAsserts, 
-                in.numAsserts - in.numAssertsFailed, 
-                in.numAssertsFailed
-            )
-        );
-        
-        godot::UtilityFunctions::print(
-            godot::vformat("[%s] Status: %s!",
-                godot_reporter_name,
-                in.numTestCasesFailed == 0 ? "SUCCESS" : "FAILURE"
-            )
-        );
-    }
-
-    void test_case_start(const doctest::TestCaseData& in) override
-    {
-        g_current_test_name = in.m_name;
-    }
-
-    // (due to subcases)
-    void test_case_reenter(const doctest::TestCaseData&) override {}
-
-    void test_case_end(const doctest::CurrentTestCaseStats&) override
-    {
-        g_current_test_name = nullptr;
-    }
-
-    void test_case_exception(const doctest::TestCaseException&) override {}
-
-    void subcase_start(const doctest::SubcaseSignature&) override {}
-    void subcase_end() override {}
-
-    // Called for asserts and messages
-    void log_assert(const doctest::AssertData&) override {}
-    void log_message(const doctest::MessageData&) override {}
-
-    void test_case_skipped(const doctest::TestCaseData&) override {}
-
-    // Query reporting (for listing tests, etc.)
-    void report_query(const doctest::QueryData&) override {}
-};
-
-
-/* Sideline listener: Listener always run in background, no affected
- * by the --reporters flag. Reports per-suite timing every run, and
- * per-test-case timing when TestRunner::g_print_timing is enabled */
-struct TimingListener : public doctest::IReporter
-{
-    using IReporter::IReporter;
-
-    TimingListener(const doctest::ContextOptions& in) : IReporter() {}
-
-    std::unordered_map<std::string, double> suite_totals;
-    const char* current_name = nullptr;
-    const char* current_suite = nullptr;
-
-    void test_run_start() override
-    {
-        this->suite_totals.clear();
-        /* TODO: this doesn't feel appropriate here but it works for now: */
-        if (TestRunner::g_print_test_timing)
-        {
-            godot::UtilityFunctions::print("---- Test timings ----");
-        }
-    }
-
-    void test_run_end(const doctest::TestRunStats&) override
-    {
-        if (!TestRunner::g_print_suite_timing)
-        {
-            return;
-        }
-
-        std::vector<std::pair<std::string, double>> totals(this->suite_totals.begin(), this->suite_totals.end());
-        std::sort(totals.begin(), totals.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
-
-        godot::UtilityFunctions::print("---- Suite timings ----");
-        for (const auto& entry : totals)
-        {
-            godot::UtilityFunctions::print(godot::vformat(
-                "[%s] [%ss] %s",
-                godot_reporter_name, 
-                godot::String::num(entry.second, 3),
-                entry.first.empty() ? "(no suite)" : entry.first.c_str()
-            ));
-        }
-    }
-
-    void test_case_start(const doctest::TestCaseData& in) override
-    {
-        this->current_name = in.m_name;
-        this->current_suite = in.m_test_suite;
-    }
-
-    void test_case_reenter(const doctest::TestCaseData&) override {}
-
-    void test_case_end(const doctest::CurrentTestCaseStats& in) override
-    {
-        this->suite_totals[this->current_suite ? this->current_suite : "?"] += in.seconds;
-
-        if (TestRunner::g_print_test_timing)
-        {
-            godot::UtilityFunctions::print(godot::vformat(
-                "[%s] [%ss] %s - %s",
-                godot_reporter_name,
-                godot::String::num(in.seconds, 4),
-                in.testCaseSuccess ? "PASS" : "FAIL",
-                this->current_name ? this->current_name : "?"
-            ));
-        }
-    }
-
-    void test_case_exception(const doctest::TestCaseException&) override {}
-
-    void subcase_start(const doctest::SubcaseSignature&) override {}
-    void subcase_end() override {}
-
-    void log_assert(const doctest::AssertData&) override {}
-    void log_message(const doctest::MessageData&) override {}
-
-    void test_case_skipped(const doctest::TestCaseData&) override {}
-
-    void report_query(const doctest::QueryData&) override {}
-};
-
-
-REGISTER_REPORTER("godot", 1, GodotReporter);
-REGISTER_LISTENER("timing", 1, TimingListener);
-
-GDExtensionInterfacePrintError original_gdextension_interface_print_error = nullptr;
-GDExtensionInterfacePrintErrorWithMessage original_gdextension_interface_print_error_with_message = nullptr;
-
-bool TestRunner::g_error_called = false;
-bool TestRunner::g_currently_testing_error = false;
 bool TestRunner::g_print_test_timing = false;
 bool TestRunner::g_print_suite_timing = false;
-
-void custom_gdextension_interface_print_error(const char *p_description, const char *p_function, const char *p_file, int32_t p_line, GDExtensionBool p_editor_notify)
-{
-    TestRunner::g_error_called = true;
-    if (!(TestRunner::g_currently_testing_error))
-    {
-        original_gdextension_interface_print_error(p_description, p_function, p_file, p_line, p_editor_notify);
-        godot::UtilityFunctions::print("Error in test: ", g_current_test_name);
-    }
-}
-
-void custom_gdextension_interface_print_error_with_message(const char *p_description, const char *p_message, const char *p_function, const char *p_file, int32_t p_line, GDExtensionBool p_editor_notify)
-{
-    TestRunner::g_error_called = true;
-    if (!(TestRunner::g_currently_testing_error))
-    {
-        original_gdextension_interface_print_error_with_message(p_description, p_message, p_function, p_file, p_line, p_editor_notify);
-        godot::UtilityFunctions::print("Error in test: ", g_current_test_name);
-    }
-}
 
 void TestRunner::run(const char* gd_filter)
 {
@@ -224,19 +44,11 @@ void TestRunner::run(const char* gd_filter)
 
     context.setCout(&output_stream);
 
-    /* Save for later */
-    original_gdextension_interface_print_error = godot::internal::gdextension_interface_print_error;
-    original_gdextension_interface_print_error_with_message = godot::internal::gdextension_interface_print_error_with_message;
-    godot::internal::gdextension_interface_print_error = custom_gdextension_interface_print_error;
-    godot::internal::gdextension_interface_print_error_with_message = custom_gdextension_interface_print_error_with_message;
-
+    /* Defining it is enough */
+    GodotErrorInterceptor error_interceptor;
 
     int res = context.run();
     godot::UtilityFunctions::print(output_stream.str().c_str());
-
-    /* Restore the original functions */
-    godot::internal::gdextension_interface_print_error = original_gdextension_interface_print_error;
-    godot::internal::gdextension_interface_print_error_with_message = original_gdextension_interface_print_error_with_message;
 
     if (context.shouldExit())
     {
@@ -271,13 +83,11 @@ void TestRunner::_ready()
 
 void TestRunner::set_test_duration_printing(bool test_duration_printing)
 {
-    this->test_duration_printing = test_duration_printing;
     TestRunner::g_print_test_timing = test_duration_printing;
 }
 
 void TestRunner::set_suite_duration_printing(bool suite_duration_printing)
 {
-    this->suite_duration_printing = suite_duration_printing;
     TestRunner::g_print_suite_timing = suite_duration_printing;
 }
 

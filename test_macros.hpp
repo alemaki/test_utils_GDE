@@ -3,6 +3,10 @@
 
 #include <godot_cpp/variant/utility_functions.hpp>
 
+#include <doctest.h>
+
+#include "test_reporters.hpp"
+#include "godot_error_interceptor.hpp"
 #include "test_runner.hpp"
 #include "signal_observer.hpp"
 #include "test_utils.hpp"
@@ -29,18 +33,18 @@
 #define REQUIRE_VECTORS_NE(vec1, vec2) REQUIRE_MESSAGE(!((vec1).is_equal_approx(vec2)), (std::string(godot::String(vec1).utf8().get_data()) + " != " + godot::String(vec2).utf8().get_data()))
 
 #define CHECK_GODOT_ERROR(expression) /************************************************************************************************************************************/\
-TestRunner::g_error_called = false;                                                                                                                                         \
-TestRunner::g_currently_testing_error = true;                                                                                                                                 \
+GodotErrorInterceptor::g_error_called = false;                                                                                                                              \
+GodotErrorInterceptor::g_currently_testing_error = true;                                                                                                                    \
 expression;                                                                                                                                                                 \
-CHECK(TestRunner::g_error_called);                                                                                                                                          \
-TestRunner::g_currently_testing_error = false;
+CHECK(GodotErrorInterceptor::g_error_called);                                                                                                                               \
+GodotErrorInterceptor::g_currently_testing_error = false;
 
 
 #define REQUIRE_GODOT_ERROR(expression) /**********************************************************************************************************************************/\
-TestRunner::g_error_called = false;                                                                                                                                         \
-TestRunner::g_currently_testing_error = true;                                                                                                                                 \
+GodotErrorInterceptor::g_error_called = false;                                                                                                                              \
+GodotErrorInterceptor::g_currently_testing_error = true;                                                                                                                    \
 expression;                                                                                                                                                                 \
-REQUIRE(TestRunner::g_error_called);                                                                                                                                        \
-TestRunner::g_currently_testing_error = false;
+REQUIRE(GodotErrorInterceptor::g_error_called);                                                                                                                             \
+GodotErrorInterceptor::g_currently_testing_error = false;
 
 #endif /* BT_TEST_MACROS_HPP */

@@ -28,6 +28,9 @@ void CppTestEditorPlugin::_enter_tree()
     this->dock->add_child(this->suite_duration_printing_checkbox);
     this->dock->add_child(this->aborting_on_failure_checkbox);
 
+    this->test_duration_printing_checkbox->set_pressed(TestRunner::g_print_test_timing);
+    this->suite_duration_printing_checkbox->set_pressed(TestRunner::g_print_suite_timing);
+
     this->tests_filter_line_edit = memnew(godot::LineEdit);
     this->tests_filter_line_edit->set_tooltip_text("Tests filter pattern");
     this->dock->add_child(this->tests_filter_line_edit);
