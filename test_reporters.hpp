@@ -123,7 +123,7 @@ struct TimingListener : public doctest::IReporter
         for (const auto& entry : totals)
         {
             godot::UtilityFunctions::print(godot::vformat(
-                "[%s] [%ss] %s",
+                "[%s] [%ss] - %s",
                 godot_reporter_name, 
                 godot::String::num(entry.second, 3),
                 entry.first.empty() ? "(no suite)" : entry.first.c_str()
