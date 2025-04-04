@@ -19,6 +19,16 @@ A powerful testing framework for Godot's GDExtension in C++, bringing the conven
 - **Exception Requirement**:  Doctest's `REQUIRE` demands GDExtension to be built with exceptions enabled. If exceptions are disabled, any `REQUIRE` will behave as `CHECK` instead.
 - **Segfault Risks**: If a test causes a segmentation fault during editor tests, it will crash the entire engine. ¯\\\_(ツ)_/¯. During runtime, only the scene/current process will crash.
 
+### Building
+
+This folder is a standalone SCons static library — drop it into any godot-cpp project and pull it in from your `SConstruct` with one line:
+
+```python
+SConscript(os.path.join('path', 'to', 'test_utils', 'SConscript'), exports='env')
+```
+
+The only requirement is `env`: a godot-cpp-configured `Environment` (i.e. whatever `SConscript('.../godot-cpp/SConstruct')` hands back). Everything else is handled internally — it discovers its own sources, appends its own include paths (itself and `doctest/`) onto `env['CPPPATH']`, builds into its own `bin/` folder, and registers itself in `env['LIBS']` so it's automatically linked into whatever you build with that `env` afterwards.
+
 ### Setup
 
 1. Ensure the following initialization functions are registered in your module:
