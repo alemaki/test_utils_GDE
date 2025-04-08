@@ -33,7 +33,10 @@ mono_crash.*.json
 .vscode
 
 # Git ignores
-.gitconfig# Godot 4+ specific ignores
+.gitconfig
+
+# Project specific ignores
+bin/# Godot 4+ specific ignores
 .godot/
 .gdextension/godot-cpp/
 .vs
@@ -70,3 +73,6 @@ mono_crash.*.json
 
 # Git ignores
 .gitconfig
+
+# Project specific ignores
+bin/

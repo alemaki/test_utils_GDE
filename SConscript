@@ -1,6 +1,7 @@
 import os
-
-# The only thing this build needs from whoever includes it is a godot-cpp-configured Environment. 
+from SCons.Script import Import, Return
+env = None
+# The only thing this build needs from whoever includes it is a godot-cpp-configured Environment.
 # This whole test_utils/ folder can be dropped into any godot-cpp project and pulled in with just:
 #
 #   test_utils_lib = SConscript(os.path.join('path', 'to', 'test_utils', 'SConscript'), exports='env')
