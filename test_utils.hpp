@@ -14,7 +14,7 @@ double get_node_delta(godot::Node* node);
 double get_current_engine_delta();
 
 template<typename T>
-godot::TypedArray<T> get_all_children_of_type(godot::Node* node)
+godot::TypedArray<T> get_all_children_of_type(godot::Node* node, bool recursive = false)
 {
     static_assert(std::is_base_of<godot::Node, T>::value, "T must inherit from godot::Node");
     ERR_FAIL_NULL_V(node, {});
@@ -22,12 +22,16 @@ godot::TypedArray<T> get_all_children_of_type(godot::Node* node)
     godot::TypedArray<T> result;
     for (int i = 0, size = children.size(); i < size; i++)
     {
-        godot::Node* child = godot::Object::cast_to<godot::Node>(children[i]);
-        if (child->get_class() == T::get_class_static())
+        T* t_child = godot::Object::cast_to<T>(children[i]);
+        if (t_child)
         {
-            result.push_back(child);
+            result.push_back(t_child);
         }
-        result.append_array(get_all_children_of_type<T>(child));
+        if (recursive)
+        {
+            godot::Node* child = godot::Object::cast_to<godot::Node>(children[i]);
+            result.append_array(get_all_children_of_type<T>(child, true));
+        }
     }
     return result;
 }
