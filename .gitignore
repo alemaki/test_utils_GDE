@@ -14,44 +14,6 @@
 # Scons ignores.
 *.sconsign.dblite
 *.TMP
-
-# Godot-specific ignores
-*.import
-.import/
-export.cfg
-export_presets.cfg
-
-# Imported translations (automatically generated from CSV files)
-*.translation
-
-# Mono-specific ignores
-.mono/
-data_*/
-mono_crash.*.json
-
-# Editor ignores
-.vscode
-
-# Git ignores
-.gitconfig
-
-# Project specific ignores
-bin/# Godot 4+ specific ignores
-.godot/
-.gdextension/godot-cpp/
-.vs
-
-# C++ objects specific ignores
-*.dll
-*.os
-*.o
-*.a
-*.so
-*.obj
-
-# Scons ignores.
-*.sconsign.dblite
-*.TMP
 *.cons
 *.pdb
 
@@ -68,6 +30,7 @@ export_presets.cfg
 .mono/
 data_*/
 mono_crash.*.json
+
 # Editor ignores
 .vscode
 
