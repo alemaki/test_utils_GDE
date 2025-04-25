@@ -29,7 +29,7 @@ struct GodotReporter : public doctest::IReporter
 
     void test_run_end(const doctest::TestRunStats& in) override
     {
-        godot::UtilityFunctions::print("---- Test Results ----");
+        godot::UtilityFunctions::print(godot::vformat("[%s] ---- Test Results ----", godot_reporter_name));
         godot::UtilityFunctions::print(
             godot::vformat("[%s] test cases: %d | %d passed | %d failed | %d skipped", 
                 godot_reporter_name, 
