@@ -29,7 +29,7 @@ struct GodotReporter : public doctest::IReporter
 
     void test_run_end(const doctest::TestRunStats& in) override
     {
-        godot::UtilityFunctions::print(godot::vformat("[%s] ---- Test Results ----", godot_reporter_name));
+        godot::UtilityFunctions::print(godot::vformat("\n[%s] ---- Test Results ----", godot_reporter_name));
         godot::UtilityFunctions::print(
             godot::vformat("[%s] test cases: %d | %d passed | %d failed | %d skipped", 
                 godot_reporter_name, 
@@ -76,8 +76,40 @@ struct GodotReporter : public doctest::IReporter
     void subcase_end() override {}
 
     // Called for asserts and messages
-    void log_assert(const doctest::AssertData&) override {}
-    void log_message(const doctest::MessageData&) override {}
+    void log_assert(const doctest::AssertData& in) override
+    {
+        if (!in.m_failed)
+        {
+            return;
+        }
+        godot::UtilityFunctions::print(godot::vformat(
+            "[%s] FAILED: %s:%d %s( %s )",
+            godot_reporter_name,
+            in.m_file,
+            in.m_line,
+            doctest::assertString(in.m_at),
+            in.m_expr
+        ));
+        if (in.m_threw)
+        {
+            godot::UtilityFunctions::print(godot::vformat("[%s]   threw exception: %s", godot_reporter_name, in.m_exception.c_str()));
+        }
+        else if (!(in.m_at & doctest::assertType::is_throws))
+        {
+            godot::UtilityFunctions::print(godot::vformat("[%s]   values: %s", godot_reporter_name, in.m_decomp.c_str()));
+        }
+    }
+
+    void log_message(const doctest::MessageData& in) override
+    {
+        godot::UtilityFunctions::print(godot::vformat(
+            "[%s] %s:%d MESSAGE: %s",
+            godot_reporter_name,
+            in.m_file,
+            in.m_line,
+            in.m_string.c_str()
+        ));
+    }
 
     void test_case_skipped(const doctest::TestCaseData&) override {}
 
