@@ -11,16 +11,16 @@ private:
 public:
     GodotErrorInterceptor()
     {
-        GodotErrorInterceptor::original_gdextension_interface_print_error = godot::internal::gdextension_interface_print_error;
-        GodotErrorInterceptor::original_gdextension_interface_print_error_with_message = godot::internal::gdextension_interface_print_error_with_message;
-        godot::internal::gdextension_interface_print_error = GodotErrorInterceptor::gdextension_interface_print_error_intercept;
-        godot::internal::gdextension_interface_print_error_with_message = GodotErrorInterceptor::gdextension_interface_print_error_with_message_intercept;
+        GodotErrorInterceptor::original_gdextension_interface_print_error = godot::gdextension_interface::print_error;
+        GodotErrorInterceptor::original_gdextension_interface_print_error_with_message = godot::gdextension_interface::print_error_with_message;
+        godot::gdextension_interface::print_error = GodotErrorInterceptor::gdextension_interface_print_error_intercept;
+        godot::gdextension_interface::print_error_with_message = GodotErrorInterceptor::gdextension_interface_print_error_with_message_intercept;
     }
 
     ~GodotErrorInterceptor()
     {
-        godot::internal::gdextension_interface_print_error = GodotErrorInterceptor::original_gdextension_interface_print_error;
-        godot::internal::gdextension_interface_print_error_with_message = GodotErrorInterceptor::original_gdextension_interface_print_error_with_message;
+        godot::gdextension_interface::print_error = GodotErrorInterceptor::original_gdextension_interface_print_error;
+        godot::gdextension_interface::print_error_with_message = GodotErrorInterceptor::original_gdextension_interface_print_error_with_message;
     }
 
     static bool g_error_called;
